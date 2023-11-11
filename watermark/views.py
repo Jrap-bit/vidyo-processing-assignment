@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.conf import settings
 from django.core.files.storage import default_storage
 from django.core.files.base import ContentFile
-
 from .models import WatermarkedVideo
 from .forms import WatermarkForm
 
@@ -22,36 +21,38 @@ def watermark_video_view(request):
 
             video_filename = video_file.name
             watermark_filename = watermark_image_file.name
-
-            # Save the files to the MEDIA_ROOT
             video_path = default_storage.save(f"videos/{video_filename}", ContentFile(video_file.read()))
             watermark_path = default_storage.save(f"watermarks/{watermark_filename}",
                                                   ContentFile(watermark_image_file.read()))
 
+            # Give Unique Name to Output File
             id = uuid.uuid4()
             output_filename = f"{id}-watermarked_{video_file.name}"
             output_filepath = default_storage.path(f"watermarked_videos/{output_filename}")
 
+            # Watermark Video
             try:
+                # Get Video Dimensions
                 probe = ffmpeg.probe(default_storage.path(video_path))
                 video_streams = [stream for stream in probe['streams'] if stream['codec_type'] == 'video']
                 video_width = int(video_streams[0]['width'])
                 video_height = int(video_streams[0]['height'])
 
+                # Set watermark width
                 watermark_width = watermark_size
 
-                # Probe the watermark to get its original dimensions
+                # Get Watermark Dimensions
                 watermark_info = ffmpeg.probe(default_storage.path(watermark_path))
                 watermark_original_width = int(watermark_info['streams'][0]['width'])
                 watermark_original_height = int(watermark_info['streams'][0]['height'])
 
-                # Calculate the new height of the watermark while maintaining aspect ratio
+                # Calculate watermark height
                 watermark_height = int((watermark_original_height / watermark_original_width) * watermark_width)
 
             except ffmpeg.Error as e:
                 return HttpResponseBadRequest("An error occurred while probing the video.")
 
-            # Map the position keyword to FFmpeg overlay filter parameters
+            # Map Positions to Coordinates
             position_mappings = {
                 'top-left': (padding, padding),
                 'top-right': (video_width - watermark_width - padding, padding),
@@ -62,7 +63,7 @@ def watermark_video_view(request):
 
             overlay_x, overlay_y = position_mappings.get(watermark_position, (padding, padding))
 
-            # Apply watermark using ffmpeg
+            # Apply Watermark to Video
             try:
                 in_video = ffmpeg.input(default_storage.path(video_path))
                 watermark = ffmpeg.input(default_storage.path(watermark_path)).filter('scale', watermark_width,
@@ -71,14 +72,13 @@ def watermark_video_view(request):
                 has_audio = any(stream['codec_type'] == 'audio' for stream in probe['streams'])
                 overlay_video = ffmpeg.overlay(in_video['v'], watermark, x=overlay_x, y=overlay_y)
 
-                # Output file with both video and audio from the input
+                # Handle Audio and No Audio inputs
                 if has_audio:
-                    # Output file with both video and audio from the input
                     output = ffmpeg.output(overlay_video, in_video['a'], output_filepath, vcodec='libx264',
                                            acodec='copy', format='mp4')
                 else:
-                    # Output file with only video
                     output = ffmpeg.output(overlay_video, output_filepath, vcodec='libx264', format='mp4')
+
                 output.overwrite_output().run()
 
             except ffmpeg.Error as e:
@@ -97,7 +97,7 @@ def watermark_video_view(request):
             )
             new_video.save()
 
-            # Generate the URL for the watermarked video
+            # Generate URL for Video
             video_url = request.build_absolute_uri(settings.MEDIA_URL + f"watermarked_videos/{output_filename}")
 
             return JsonResponse({'video_url': video_url})
