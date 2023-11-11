@@ -1,4 +1,5 @@
 import ffmpeg
+import uuid
 from django.http import JsonResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.conf import settings
@@ -27,7 +28,8 @@ def watermark_video_view(request):
             watermark_path = default_storage.save(f"watermarks/{watermark_filename}",
                                                   ContentFile(watermark_image_file.read()))
 
-            output_filename = f"watermarked_{video_file.name}"
+            id = uuid.uuid4()
+            output_filename = f"{id}-watermarked_{video_file.name}"
             output_filepath = default_storage.path(f"watermarked_videos/{output_filename}")
 
             try:

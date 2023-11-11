@@ -1,4 +1,5 @@
 import os
+import uuid
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.conf import settings
@@ -29,7 +30,8 @@ def extract_audio_view(request):
             except ffmpeg.Error as e:
                 return HttpResponseBadRequest("An error occurred while checking the video.")
 
-            output_filename = os.path.splitext(video_file.name)[0] + '.mp3'
+            id = uuid.uuid4()
+            output_filename = f"{id}-{os.path.splitext(video_file.name)[0]}.mp3"
             output_filepath = os.path.join(settings.MEDIA_ROOT, 'audios', output_filename)
 
             # Extract Audio
