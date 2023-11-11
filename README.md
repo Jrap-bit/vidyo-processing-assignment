@@ -32,6 +32,7 @@ It is a backend project created using Django. This project mainly focuses on cre
 #### To Watermark a video:
 
 Navigate to http://localhost:8000/watermark/ in your web browser.
+<br>
 Fill out the form with the required information:
 - Video file to be watermarked.
 - Watermark image.
@@ -43,6 +44,7 @@ Optionally:
 
 #### To Extract Audio from a video:
 Navigate to http://localhost:8000/extract_audio/ in your web browser.
+<br>
 Fill out the form with the required information:
 - Video file to be extracted audio from.
 
@@ -50,7 +52,9 @@ Fill out the form with the required information:
 
 #### Checking the Database
 Navigate to `http://localhost:8000/admin/` in your web browser.
+<br>
 Login using the username and password set while creating superuser
+<br>
 You can check the databases containing the metadata of both Extracted Audios and Watermarked Videos.
 
 ## Containerization
@@ -93,11 +97,14 @@ Lastly the URL from the BLOB storage is provided to the API endpoint which repli
 
 For the efficient utilization of the resources in this architecture, we can use several different methods and tools:
 
-- **Caching:** For frequent access of data by the user, we can set up caches directly between API and the database for faster retrieval of information. Cache would mean less queries made to the database and would ensure faster delivery time for the user as well. We can implement MemCached or Redis for caching.-
--  ****Asynchronous Processing:**** We can implement asynchronous processing using Redis as a message broker so that when a user sends a request and the API endpoint places it in the task queue, it can instantly reply to the user with a loading or working-on-it message so that the user has an idea that their process is still under process. 
-- **Resource Optimization:** Nodes performing the backend video processing tasks can be optimized by the use of methods such as containerization using docker or kubernetes so that the utilization of the total available resources on the system is efficient. 
+- **Caching:** For frequent access of data by the user, we can set up caches directly between API and the database for faster retrieval of information. Cache would mean less queries made to the database and would ensure faster delivery time for the user as well. We can implement MemCached or Redis for caching.
+-  ****Asynchronous Processing:**** We can implement asynchronous processing using Redis as a message broker so that when a user sends a request and the API endpoint places it in the task queue, it can instantly reply to the user with a loading or working-on-it message so that the user has an idea that their process is still under process.
+- ****Resource Optimization:**** Nodes performing the backend video processing tasks can be optimized by the use of methods such as containerization using docker or kubernetes so that the utilization of the total available resources on the system is efficient.
+  <br>
 - **Horizontal Scaling:** The architecture allows for horizontal scaling, i.e., one can add several nodes in parallel to the already working nodes so that we can increase the processing power of the whole system without compromising with the uptime of the system. With a container orchestration tool such as Kubernetes, one can easily add or remove nodes on the platform as well as maintain the uptime of each nodes and keep the number of nodes available on the system stable and easy to manage.
+  <br>
 - **Database Indexing:** Database indexing is also one thing we can perform in order to speed up the search and data retrieval operations from the database.
+  
 
 
 
