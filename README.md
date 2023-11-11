@@ -31,7 +31,7 @@ It is a backend project created using Django. This project mainly focuses on cre
 
 #### To Watermark a video:
 
-Navigate to `http://localhost:8000/watermark/` in your web browser.
+Navigate to http://localhost:8000/watermark/ in your web browser.
 Fill out the form with the required information:
 Video file to be watermarked.
 Watermark image.
@@ -42,7 +42,7 @@ You can also include the size and padding of the watermark
 Submit the video and you'll get the respective URL of the watermarked video file.
 
 #### To Extract Audio from a video:
-Navigate to `http://localhost:8000/extract_audio/` in your web browser.
+Navigate to http://localhost:8000/extract_audio/ in your web browser.
 Fill out the form with the required information:
 
 #### Checking the Database
